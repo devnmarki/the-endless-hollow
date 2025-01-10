@@ -1,0 +1,109 @@
+package com.devnmarki.game.engine.entities.physics;
+
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.devnmarki.game.engine.Engine;
+import com.devnmarki.game.engine.entities.Entity;
+import com.devnmarki.game.engine.math.Vector2f;
+import com.devnmarki.game.engine.math.Vector2i;
+
+public class BoxCollider {
+
+	private Entity entity;
+	
+	private Vector2i size;
+	private Vector2f offset;
+	private BodyDef.BodyType type = BodyDef.BodyType.StaticBody;
+	
+	private Body body;
+	
+	public BoxCollider(Vector2i size) {
+		this(size, Vector2f.ZERO);
+	}
+	
+	public BoxCollider(Vector2i size, Vector2f offset) {
+		this.size = size;
+		this.offset = offset;
+	}
+	
+	public void update() {
+		if (body == null || entity == null) return;
+		
+		Vector2f bodyPosition = new Vector2f(
+	            (body.getPosition().x - offset.x / Engine.PPM) * Engine.PPM,
+	            (body.getPosition().y - offset.y / Engine.PPM) * Engine.PPM
+	        );
+
+        entity.getPosition().x = bodyPosition.x;
+        entity.getPosition().y = bodyPosition.y;
+	}
+	
+	private void createBody() {
+		if (entity == null) return;
+		
+		BodyDef bodyDef = new BodyDef();
+		bodyDef.type = type;
+		bodyDef.position.set((entity.getPosition().x + offset.x) / Engine.PPM, (entity.getPosition().y + offset.y) / Engine.PPM);
+		bodyDef.fixedRotation = true;
+		
+		body = Engine.WORLD.createBody(bodyDef);
+		
+		PolygonShape shape = new PolygonShape();
+		shape.setAsBox(size.x / 2f / Engine.PPM, size.y / 2f / Engine.PPM);
+		
+		FixtureDef fixtureDef = new FixtureDef();
+		fixtureDef.shape = shape;
+        fixtureDef.density = 1f;
+        fixtureDef.friction = 0f;
+        fixtureDef.restitution = 0f;
+        
+        Fixture fixture = body.createFixture(fixtureDef);
+        fixture.setUserData(this);
+        body.setUserData(entity);
+        
+        shape.dispose();
+	}
+	
+	private void destroyBody() {
+		if (body != null) {
+			Engine.WORLD.destroyBody(body);
+		}
+	}
+
+	public void setEntity(Entity entity) {
+		this.entity = entity;
+		if (body == null) {
+			createBody();
+		}
+	}
+
+	public void setSize(Vector2i size) {
+		this.size = size;
+		
+		destroyBody();
+		createBody();
+	}
+	
+	public void setOffset(Vector2f offset) {
+		this.offset = offset;
+	}
+	
+	public void setType(BodyDef.BodyType type) {
+		this.type = type;
+		
+		destroyBody();
+		createBody();
+	}
+	
+	public Entity getEntity() {
+		return this.entity;
+	}
+	
+	public Body getBody() {
+		return this.body;
+	}
+	
+}
