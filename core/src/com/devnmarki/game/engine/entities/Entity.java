@@ -72,7 +72,15 @@ public class Entity implements IEntity {
 	public void destroy() {
 		engine.getCurrentState().removeEntity(this); 
 	}
-	
+
+	public void setPosition(Vector2f position) {
+		this.position = position;
+
+		for (BoxCollider collider : colliders) {
+			collider.setPosition(position);
+		}
+	}
+
 	public void setRotation(float rotation) {
 		this.rotation = rotation;
 	}

@@ -23,8 +23,8 @@ public class SorcererEntity extends Entity {
 	private Vector2f velocity = Vector2f.ZERO;
 	private boolean grounded = false;
 	
-	public SorcererEntity(Engine engine, Vector2f position) {
-		super(engine, position);
+	public SorcererEntity(Engine engine) {
+		super(engine);
 	}
 
 	@Override

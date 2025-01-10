@@ -33,7 +33,7 @@ public class Engine {
 	private Map<String, State> states = new HashMap<String, State>();
 	private State currentState = null;
 	private State previousState = null;
-	
+
 	private Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
 	
 	public static boolean debugMode = true;

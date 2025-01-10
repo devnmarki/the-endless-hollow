@@ -52,4 +52,8 @@ public class Tilemap {
 			engine.getCurrentState().addEntity(colliderEntity);
 		}
 	}
+
+	public TiledMap getTiledMap() {
+		return map;
+	}
 }

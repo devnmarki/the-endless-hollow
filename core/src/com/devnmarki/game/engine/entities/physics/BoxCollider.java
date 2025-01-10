@@ -31,14 +31,13 @@ public class BoxCollider {
 	
 	public void update() {
 		if (body == null || entity == null) return;
-		
-		Vector2f bodyPosition = new Vector2f(
-	            (body.getPosition().x - offset.x / Engine.PPM) * Engine.PPM,
-	            (body.getPosition().y - offset.y / Engine.PPM) * Engine.PPM
-	        );
 
-        entity.getPosition().x = bodyPosition.x;
-        entity.getPosition().y = bodyPosition.y;
+		Vector2f bodyPosition = new Vector2f(
+				body.getPosition().x * Engine.PPM - offset.x,
+				body.getPosition().y * Engine.PPM - offset.y
+		);
+
+		entity.setPosition(bodyPosition);
 	}
 	
 	private void createBody() {
@@ -85,6 +84,16 @@ public class BoxCollider {
 		
 		destroyBody();
 		createBody();
+	}
+
+	public void setPosition(Vector2f position) {
+		if (body != null) {
+			body.setTransform(
+					(position.x + offset.x) / Engine.PPM,
+					(position.y + offset.y) / Engine.PPM,
+					body.getAngle()
+			);
+		}
 	}
 	
 	public void setOffset(Vector2f offset) {
