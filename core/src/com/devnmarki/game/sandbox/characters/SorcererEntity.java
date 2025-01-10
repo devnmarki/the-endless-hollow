@@ -9,19 +9,25 @@ import com.devnmarki.game.engine.Engine;
 import com.devnmarki.game.engine.entities.Entity;
 import com.devnmarki.game.engine.entities.physics.BoxCollider;
 import com.devnmarki.game.engine.entities.renderEntity.Spritesheet;
+import com.devnmarki.game.engine.entities.renderEntity.animations.Animation;
+import com.devnmarki.game.engine.entities.renderEntity.animations.Animator;
 import com.devnmarki.game.engine.math.Vector2f;
 import com.devnmarki.game.engine.math.Vector2i;
+
+import java.io.Console;
 
 public class SorcererEntity extends Entity {
 
 	private Spritesheet sheet;
 	private BoxCollider collider;
+	private Animator animator;
 
-	private static final float SPEED = 2f;
+	private static final float SPEED = 3f;
 	private static final float JUMP_FORCE = 0.9f;
 
 	private Vector2f velocity = Vector2f.ZERO;
 	private boolean grounded = false;
+	private int facingDirection = 0;
 	
 	public SorcererEntity(Engine engine) {
 		super(engine);
@@ -36,7 +42,14 @@ public class SorcererEntity extends Entity {
 		this.addCollider(collider);
 		
 		sheet = new Spritesheet(AssetPool.getTexture("sprites/characters/player_sheet.png"), 2, 2, new Vector2i(8), false);
-		getSpriteRenderer().setSprite(sheet.getSprite(0));
+
+		animator = new Animator(this);
+		animator.addAnimation("idle_left", new Animation(sheet, new int[] { 0 }, 0.1f, true, false));
+		animator.addAnimation("idle_right", new Animation(sheet, new int[] { 0 }, 0.1f, true, true));
+		animator.addAnimation("walk_left", new Animation(sheet, new int[] { 2, 3 }, 0.2f, true, false));
+		animator.addAnimation("walk_right", new Animation(sheet, new int[] { 2, 3 }, 0.2f, true, true));
+
+		System.out.println(sheet.getSprites().size());
 	}
 
 	@Override
@@ -45,13 +58,20 @@ public class SorcererEntity extends Entity {
 		
 		handleInputs();
 		move();
+
+		handleAnimations();
+
+		animator.update();
+		animator.render();
 	}
 	
 	private void handleInputs() {
 		if (Gdx.input.isKeyPressed(Keys.LEFT)) {
 			velocity.x = -1f;
+			facingDirection = 0;
 		} else if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
 			velocity.x = 1f;
+			facingDirection = 1;
 		} else {
 			velocity.x = 0f;
 		}
@@ -69,6 +89,32 @@ public class SorcererEntity extends Entity {
 	private void jump() {
 		collider.getBody().applyLinearImpulse(0, JUMP_FORCE, collider.getBody().getWorldCenter().x, collider.getBody().getWorldCenter().y, true);
 		grounded = false;
+	}
+
+	private void handleAnimations() {
+		if (velocity.x == 0f) {
+			switch (facingDirection) {
+				case 0:
+					animator.playAnimation("idle_left");
+					break;
+				case 1:
+					animator.playAnimation("idle_right");
+					break;
+				default:
+					break;
+			}
+		} else {
+			switch (facingDirection) {
+				case 0:
+					animator.playAnimation("walk_left");
+					break;
+				case 1:
+					animator.playAnimation("walk_right");
+					break;
+				default:
+					break;
+			}
+		}
 	}
 
 	@Override

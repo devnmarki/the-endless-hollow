@@ -1,7 +1,5 @@
 package com.devnmarki.game.sandbox.states;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.devnmarki.game.engine.AssetPool;
 import com.devnmarki.game.engine.Engine;
 import com.devnmarki.game.engine.states.State;

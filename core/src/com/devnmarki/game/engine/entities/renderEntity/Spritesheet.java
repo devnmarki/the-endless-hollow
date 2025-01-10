@@ -41,5 +41,13 @@ public class Spritesheet {
 	public Sprite getSprite(int index) {
 		return sprites.get(index);
 	}
+
+	public List<Sprite> getSprites() {
+		return sprites;
+	}
+
+	public TextureRegion getTexture() {
+		return texture;
+	}
 	
 }
