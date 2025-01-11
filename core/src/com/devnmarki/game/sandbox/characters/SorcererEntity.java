@@ -73,10 +73,6 @@ public class SorcererEntity extends Entity {
 
 		animator.update();
 		animator.render();
-
-//		Engine.SHAPE_RENDERER.begin(ShapeRenderer.ShapeType.Filled);
-//		Engine.SHAPE_RENDERER.rect(shootPoint.x, shootPoint.y, 5, 5);
-//		Engine.SHAPE_RENDERER.end();
 	}
 	
 	private void handleInputs() {

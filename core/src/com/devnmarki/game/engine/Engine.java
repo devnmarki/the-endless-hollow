@@ -44,7 +44,7 @@ public class Engine {
 	
 	public void start() {
 		WORLD.setContactListener(new MyContactListener());
- 	}
+	}
 	
 	public void update() {
 		if (currentState != null) {
@@ -62,10 +62,9 @@ public class Engine {
 			}
 			
 			SPRITE_BATCH.end();
-			
-			currentState.getCamera().position.set(currentState.getCamera().viewportWidth / 2, currentState.getCamera().viewportHeight / 2, 0);
-			currentState.getCamera().update();
-			
+
+			SPRITE_BATCH.setProjectionMatrix(getCurrentState().getCamera().combined);
+
 			if (debugMode) {
 				debugRenderer.render(WORLD, SPRITE_BATCH.getProjectionMatrix().cpy().scale(Engine.PPM, Engine.PPM, 1));
 			}
