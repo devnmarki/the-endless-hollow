@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.Filter;
 import com.devnmarki.game.engine.Engine;
 import com.devnmarki.game.engine.entities.physics.BoxCollider;
 import com.devnmarki.game.engine.entities.renderEntity.SpriteRenderer;
@@ -12,6 +14,9 @@ import com.devnmarki.game.engine.math.Vector2f;
 public class Entity implements IEntity {
 
 	protected Engine engine;
+
+	protected String tag = "untagged";
+	protected String name = "Entity";
 
 	protected Vector2f position;
 	protected float rotation;
@@ -60,7 +65,7 @@ public class Entity implements IEntity {
 	}
 	
 	@Override
-	public void onCollisionEnter(BoxCollider other, Vector2 normal) {
+	public void onCollisionEnter(BoxCollider other, Vector2 normal, Contact contact) {
 		
 	}
 	
@@ -68,7 +73,12 @@ public class Entity implements IEntity {
 	public void onCollisionExit(BoxCollider other) {
 		
 	}
-	
+
+	@Override
+	public void onCollisionPreSolve(BoxCollider other, Contact contact) {
+
+	}
+
 	public void destroy() {
 		engine.getCurrentState().removeEntity(this); 
 	}
@@ -84,7 +94,15 @@ public class Entity implements IEntity {
 	public void setRotation(float rotation) {
 		this.rotation = rotation;
 	}
-	
+
+	public String getTag() {
+		return tag;
+	}
+
+	public String getName() {
+		return name;
+	}
+
 	public Vector2f getPosition() {
 		return this.position;
 	}

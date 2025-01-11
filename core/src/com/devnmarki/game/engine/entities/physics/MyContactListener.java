@@ -21,11 +21,11 @@ public class MyContactListener implements ContactListener {
         Vector2 normal = contact.getWorldManifold().getNormal();
         
         if (entityA != null && entityA instanceof ICollidable) {
-            ((ICollidable) entityA).onCollisionEnter((BoxCollider) fb.getUserData(), normal);
+            ((ICollidable) entityA).onCollisionEnter((BoxCollider) fb.getUserData(), normal, contact);
         }
 
         if (entityB != null && entityB instanceof ICollidable) {
-            ((ICollidable) entityB).onCollisionEnter((BoxCollider) fa.getUserData(), normal.scl(-1));
+            ((ICollidable) entityB).onCollisionEnter((BoxCollider) fa.getUserData(), normal.scl(-1), contact);
         }
 	}
 
@@ -48,7 +48,19 @@ public class MyContactListener implements ContactListener {
 
 	@Override
 	public void preSolve(Contact contact, Manifold oldManifold) {
-		
+        Fixture fa = contact.getFixtureA();
+        Fixture fb = contact.getFixtureB();
+
+        Entity entityA = (Entity) fa.getBody().getUserData();
+        Entity entityB = (Entity) fb.getBody().getUserData();
+
+        if (entityA != null && entityA instanceof ICollidable) {
+            ((ICollidable) entityA).onCollisionPreSolve((BoxCollider) fb.getUserData(), contact);
+        }
+
+        if (entityB != null && entityB instanceof ICollidable) {
+            ((ICollidable) entityB).onCollisionPreSolve((BoxCollider) fa.getUserData(), contact);
+        }
 	}
 
 	@Override

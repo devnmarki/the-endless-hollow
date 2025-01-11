@@ -1,10 +1,6 @@
 package com.devnmarki.game.engine.entities.physics;
 
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.*;
 import com.devnmarki.game.engine.Engine;
 import com.devnmarki.game.engine.entities.Entity;
 import com.devnmarki.game.engine.math.Vector2f;
@@ -19,6 +15,7 @@ public class BoxCollider {
 	private BodyDef.BodyType type = BodyDef.BodyType.StaticBody;
 	
 	private Body body;
+	private Fixture fixture;
 	
 	public BoxCollider(Vector2i size) {
 		this(size, Vector2f.ZERO);
@@ -59,11 +56,18 @@ public class BoxCollider {
         fixtureDef.friction = 0f;
         fixtureDef.restitution = 0f;
         
-        Fixture fixture = body.createFixture(fixtureDef);
+        fixture = body.createFixture(fixtureDef);
         fixture.setUserData(this);
         body.setUserData(entity);
         
         shape.dispose();
+	}
+
+	public Filter createFilter(short category, short mask) {
+		Filter filter = new Filter();
+		filter.categoryBits = category;
+		filter.maskBits = mask;
+		return filter;
 	}
 	
 	private void destroyBody() {
@@ -113,6 +117,10 @@ public class BoxCollider {
 	
 	public Body getBody() {
 		return this.body;
+	}
+
+	public Fixture getFixture() {
+		return fixture;
 	}
 	
 }

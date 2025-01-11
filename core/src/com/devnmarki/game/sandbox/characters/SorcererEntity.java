@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Contact;
 import com.devnmarki.game.engine.AssetPool;
 import com.devnmarki.game.engine.Engine;
 import com.devnmarki.game.engine.entities.Entity;
@@ -13,6 +14,8 @@ import com.devnmarki.game.engine.entities.renderEntity.animations.Animation;
 import com.devnmarki.game.engine.entities.renderEntity.animations.Animator;
 import com.devnmarki.game.engine.math.Vector2f;
 import com.devnmarki.game.engine.math.Vector2i;
+import com.devnmarki.game.sandbox.CollisionConstants;
+import com.devnmarki.game.sandbox.characters.enemies.Enemy;
 
 import java.io.Console;
 
@@ -36,11 +39,16 @@ public class SorcererEntity extends Entity {
 	@Override
 	public void onStart() {
 		super.onStart();
-		
+
+		this.tag = "player";
+		this.name = "Sorcerer";
+
 		collider = new BoxCollider(new Vector2i(6, 7).mul((int)Engine.gameScale), new Vector2f(4f, -4.5f).mul(Engine.gameScale));
 		collider.setType(BodyDef.BodyType.DynamicBody);
 		this.addCollider(collider);
-		
+		collider.getFixture().getFilterData().categoryBits = CollisionConstants.CATEGORY_SORCERER;
+		collider.getFixture().getFilterData().maskBits = CollisionConstants.MASK_SORCERER;
+
 		sheet = new Spritesheet(AssetPool.getTexture("sprites/characters/player_sheet.png"), 2, 2, new Vector2i(8), false);
 
 		animator = new Animator(this);
@@ -118,12 +126,18 @@ public class SorcererEntity extends Entity {
 	}
 
 	@Override
-	public void onCollisionEnter(BoxCollider other, Vector2 normal) {
-		super.onCollisionEnter(other, normal);	
-		
+	public void onCollisionEnter(BoxCollider other, Vector2 normal, Contact contact) {
+		super.onCollisionEnter(other, normal, contact);
+
 		if (normal.y < 0) {
 			grounded = true;
 		}
    	}
-	
+
+	@Override
+	public void onCollisionPreSolve(BoxCollider other, Contact contact) {
+		super.onCollisionPreSolve(other, contact);
+
+
+	}
 }

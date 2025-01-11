@@ -11,6 +11,7 @@ import com.devnmarki.game.engine.entities.Entity;
 import com.devnmarki.game.engine.entities.physics.BoxCollider;
 import com.devnmarki.game.engine.math.Vector2f;
 import com.devnmarki.game.engine.math.Vector2i;
+import com.devnmarki.game.sandbox.CollisionConstants;
 
 public class Tilemap {
 
@@ -47,7 +48,9 @@ public class Tilemap {
 			Vector2f colliderSize = new Vector2f(w, h);
 
 			Entity colliderEntity = new Entity(engine, colliderPos);
-			colliderEntity.addCollider(new BoxCollider(new Vector2i((int) colliderSize.x, (int) colliderSize.y)));
+			BoxCollider collider = new BoxCollider(new Vector2i((int) colliderSize.x, (int) colliderSize.y));
+			colliderEntity.addCollider(collider);
+			collider.getFixture().setFilterData(collider.createFilter(CollisionConstants.CATEGORY_WALL, CollisionConstants.MASK_WALL));
 
 			engine.getCurrentState().addEntity(colliderEntity);
 		}
