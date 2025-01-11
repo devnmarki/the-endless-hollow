@@ -44,7 +44,7 @@ public class Engine {
 	
 	public void start() {
 		WORLD.setContactListener(new MyContactListener());
- 	}
+	}
 	
 	public void update() {
 		if (currentState != null) {
@@ -62,13 +62,14 @@ public class Engine {
 			}
 			
 			SPRITE_BATCH.end();
-			
-			currentState.getCamera().position.set(currentState.getCamera().viewportWidth / 2, currentState.getCamera().viewportHeight / 2, 0);
-			currentState.getCamera().update();
-			
+
+			SPRITE_BATCH.setProjectionMatrix(getCurrentState().getCamera().combined);
+
 			if (debugMode) {
 				debugRenderer.render(WORLD, SPRITE_BATCH.getProjectionMatrix().cpy().scale(Engine.PPM, Engine.PPM, 1));
 			}
+
+			processPendingDestruction();
 		}
 		
 		if (Gdx.input.isKeyJustPressed(Keys.TAB)) {
@@ -115,6 +116,20 @@ public class Engine {
 		} else {
 			System.out.println("Unable to find state: " + stateName);
 		}
+	}
+
+	public void processPendingDestruction() {
+		List<Entity> entitiesToRemove = new ArrayList<>();
+
+		List<Entity> entitiesCopy = new ArrayList<>(currentState.getEntities());
+		for (Entity entity : entitiesCopy) {
+			if (entity.isPendingDestroy()) {
+				entity.destroy();
+				entitiesToRemove.add(entity);
+			}
+		}
+
+		currentState.getEntities().removeAll(entitiesToRemove);
 	}
 	
 	public void clear(Color color) {

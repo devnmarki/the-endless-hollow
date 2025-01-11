@@ -39,6 +39,30 @@ public abstract class State {
 	public void removeEntity(Entity entity) {
 		this.entities.remove(entity);
 	}
+
+	public Entity findEntityWithTag(String tag) {
+		Entity target = null;
+
+		for (Entity entity : entities) {
+			if (!entity.getTag().equals(tag)) continue;
+
+			target = entity;
+		}
+
+		return target;
+	}
+
+	public List<Entity> findEntitiesWithTag(String tag) {
+		List<Entity> targetList = new ArrayList<Entity>();
+
+		for (Entity entity : entities) {
+			if (!entity.getTag().equals(tag)) continue;
+
+			targetList.add(entity);
+		}
+
+		return targetList;
+	}
 	
 	public Engine getEngine() {
 		return engine;

@@ -4,24 +4,34 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Contact;
 import com.devnmarki.game.engine.AssetPool;
 import com.devnmarki.game.engine.Engine;
 import com.devnmarki.game.engine.entities.Entity;
 import com.devnmarki.game.engine.entities.physics.BoxCollider;
 import com.devnmarki.game.engine.entities.renderEntity.Spritesheet;
+import com.devnmarki.game.engine.entities.renderEntity.animations.Animation;
+import com.devnmarki.game.engine.entities.renderEntity.animations.Animator;
 import com.devnmarki.game.engine.math.Vector2f;
 import com.devnmarki.game.engine.math.Vector2i;
+import com.devnmarki.game.sandbox.CollisionConstants;
+import com.devnmarki.game.sandbox.characters.enemies.Enemy;
+import com.devnmarki.game.sandbox.objects.SorcererBulletEntity;
 
 public class SorcererEntity extends Entity {
 
 	private Spritesheet sheet;
 	private BoxCollider collider;
+	private Animator animator;
 
-	private static final float SPEED = 2f;
+	private static final float SPEED = 3f;
 	private static final float JUMP_FORCE = 0.9f;
 
 	private Vector2f velocity = Vector2f.ZERO;
 	private boolean grounded = false;
+	private int facingDirection = 0;
+
+	private Vector2f shootPoint;
 	
 	public SorcererEntity(Engine engine) {
 		super(engine);
@@ -30,13 +40,25 @@ public class SorcererEntity extends Entity {
 	@Override
 	public void onStart() {
 		super.onStart();
-		
+
+		this.tag = "player";
+		this.name = "Sorcerer";
+
 		collider = new BoxCollider(new Vector2i(6, 7).mul((int)Engine.gameScale), new Vector2f(4f, -4.5f).mul(Engine.gameScale));
 		collider.setType(BodyDef.BodyType.DynamicBody);
 		this.addCollider(collider);
-		
+		collider.getFixture().getFilterData().categoryBits = CollisionConstants.CATEGORY_SORCERER;
+		collider.getFixture().getFilterData().maskBits = CollisionConstants.MASK_SORCERER;
+
 		sheet = new Spritesheet(AssetPool.getTexture("sprites/characters/player_sheet.png"), 2, 2, new Vector2i(8), false);
-		getSpriteRenderer().setSprite(sheet.getSprite(0));
+
+		animator = new Animator(this);
+		animator.addAnimation("idle_left", new Animation(sheet, new int[] { 0 }, 0.1f, true, false));
+		animator.addAnimation("idle_right", new Animation(sheet, new int[] { 0 }, 0.1f, true, true));
+		animator.addAnimation("walk_left", new Animation(sheet, new int[] { 2, 3 }, 0.2f, true, false));
+		animator.addAnimation("walk_right", new Animation(sheet, new int[] { 2, 3 }, 0.2f, true, true));
+
+		shootPoint = position;
 	}
 
 	@Override
@@ -45,13 +67,21 @@ public class SorcererEntity extends Entity {
 		
 		handleInputs();
 		move();
+		handleShootPoint();
+
+		handleAnimations();
+
+		animator.update();
+		animator.render();
 	}
 	
 	private void handleInputs() {
 		if (Gdx.input.isKeyPressed(Keys.LEFT)) {
 			velocity.x = -1f;
+			facingDirection = 0;
 		} else if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
 			velocity.x = 1f;
+			facingDirection = 1;
 		} else {
 			velocity.x = 0f;
 		}
@@ -59,6 +89,10 @@ public class SorcererEntity extends Entity {
 		
 		if (Gdx.input.isKeyPressed(Keys.Z) && grounded) {
 			jump();
+		}
+
+		if (Gdx.input.isKeyJustPressed(Keys.X)) {
+			shoot();
 		}
 	}
 	
@@ -71,13 +105,65 @@ public class SorcererEntity extends Entity {
 		grounded = false;
 	}
 
+	private void handleShootPoint() {
+		if (facingDirection == 0) {
+			shootPoint = new Vector2f(position.x - 45f, position.y);
+		} else {
+			shootPoint = new Vector2f(position.x + 45f, position.y);
+		}
+	}
+
+	private void shoot() {
+		SorcererBulletEntity bullet = new SorcererBulletEntity(engine, shootPoint, facingDirection);
+		engine.getCurrentState().addEntity(bullet);
+	}
+
+	private void handleAnimations() {
+		if (velocity.x == 0f) {
+			switch (facingDirection) {
+				case 0:
+					animator.playAnimation("idle_left");
+					break;
+				case 1:
+					animator.playAnimation("idle_right");
+					break;
+				default:
+					break;
+			}
+		} else {
+			switch (facingDirection) {
+				case 0:
+					animator.playAnimation("walk_left");
+					break;
+				case 1:
+					animator.playAnimation("walk_right");
+					break;
+				default:
+					break;
+			}
+		}
+	}
+
 	@Override
-	public void onCollisionEnter(BoxCollider other, Vector2 normal) {
-		super.onCollisionEnter(other, normal);	
-		
-		if (normal.y < 0) {
-			grounded = true;
+	public void onCollisionEnter(BoxCollider other, Vector2 normal, Contact contact) {
+		super.onCollisionEnter(other, normal, contact);
+
+		if (!(other.getEntity() instanceof Enemy)) {
+			if (normal.y < 0) {
+				grounded = true;
+			}
 		}
    	}
-	
+
+	@Override
+	public void onCollisionPreSolve(BoxCollider other, Contact contact) {
+		super.onCollisionPreSolve(other, contact);
+
+		short firstBit = contact.getFixtureA().getFilterData().categoryBits;
+		short secondBit = contact.getFixtureB().getFilterData().categoryBits;
+
+		if ((firstBit | secondBit) == (CollisionConstants.CATEGORY_SORCERER | CollisionConstants.CATEGORY_ENEMY)) {
+			contact.setEnabled(false);
+		}
+	}
 }

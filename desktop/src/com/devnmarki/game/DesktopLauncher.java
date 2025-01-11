@@ -1,5 +1,6 @@
 package com.devnmarki.game;
 
+import com.badlogic.gdx.Files;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.devnmarki.game.engine.Engine;
@@ -12,6 +13,7 @@ public class DesktopLauncher {
 		config.setResizable(false);
 		config.setForegroundFPS(60);
 		config.setTitle("The Endless Hollow");
+		config.setWindowIcon(Files.FileType.Internal, "icon.png");
 		new Lwjgl3Application(new Game(), config);
 	}
 }

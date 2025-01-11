@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.Filter;
 import com.devnmarki.game.engine.Engine;
 import com.devnmarki.game.engine.entities.physics.BoxCollider;
 import com.devnmarki.game.engine.entities.renderEntity.SpriteRenderer;
@@ -13,12 +15,18 @@ public class Entity implements IEntity {
 
 	protected Engine engine;
 
+	protected String tag = "untagged";
+	protected String name = "Entity";
+
 	protected Vector2f position;
 	protected float rotation;
 	
 	private List<BoxCollider> colliders = new ArrayList<BoxCollider>();
 	
 	private SpriteRenderer spriteRenderer;
+
+	private boolean isPendingDestroy = false;
+
 	
 	public Entity(Engine engine) {
 		this.engine = engine;
@@ -60,7 +68,7 @@ public class Entity implements IEntity {
 	}
 	
 	@Override
-	public void onCollisionEnter(BoxCollider other, Vector2 normal) {
+	public void onCollisionEnter(BoxCollider other, Vector2 normal, Contact contact) {
 		
 	}
 	
@@ -68,9 +76,25 @@ public class Entity implements IEntity {
 	public void onCollisionExit(BoxCollider other) {
 		
 	}
-	
+
+	@Override
+	public void onCollisionPreSolve(BoxCollider other, Contact contact) {
+
+	}
+
 	public void destroy() {
-		engine.getCurrentState().removeEntity(this); 
+		for (BoxCollider collider : colliders) {
+			if (collider != null && collider.getBody() != null) {
+				Engine.WORLD.destroyBody(collider.getBody());
+			}
+		}
+		colliders.clear();
+
+		engine.getCurrentState().removeEntity(this);
+	}
+
+	public void markForDestroy() {
+		isPendingDestroy = true;
 	}
 
 	public void setPosition(Vector2f position) {
@@ -84,7 +108,15 @@ public class Entity implements IEntity {
 	public void setRotation(float rotation) {
 		this.rotation = rotation;
 	}
-	
+
+	public String getTag() {
+		return tag;
+	}
+
+	public String getName() {
+		return name;
+	}
+
 	public Vector2f getPosition() {
 		return this.position;
 	}
@@ -100,4 +132,9 @@ public class Entity implements IEntity {
 	public SpriteRenderer getSpriteRenderer() {
 		return this.spriteRenderer;
 	}
+
+	public boolean isPendingDestroy() {
+		return isPendingDestroy;
+	}
+
 }

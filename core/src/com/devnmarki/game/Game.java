@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.devnmarki.game.engine.Engine;
 import com.devnmarki.game.engine.tilemap.EntityLoader;
 import com.devnmarki.game.sandbox.characters.SorcererEntity;
+import com.devnmarki.game.sandbox.characters.enemies.WatcherEnemy;
 import com.devnmarki.game.sandbox.states.GameState;
 import com.devnmarki.game.sandbox.states.TestState;
 
@@ -20,6 +21,7 @@ public class Game extends ApplicationAdapter {
 		Engine.gameScale = 6f;
 
 		EntityLoader.addEntityToLoad("Player", () -> new SorcererEntity(engine));
+		EntityLoader.addEntityToLoad("Watcher", () -> new WatcherEnemy(engine));
 		
 		engine.addState("game", new GameState(engine));
 		engine.addState("test", new TestState(engine));
