@@ -16,8 +16,7 @@ import com.devnmarki.game.engine.math.Vector2f;
 import com.devnmarki.game.engine.math.Vector2i;
 import com.devnmarki.game.sandbox.CollisionConstants;
 import com.devnmarki.game.sandbox.characters.enemies.Enemy;
-
-import java.io.Console;
+import com.devnmarki.game.sandbox.objects.SorcererBulletEntity;
 
 public class SorcererEntity extends Entity {
 
@@ -31,6 +30,8 @@ public class SorcererEntity extends Entity {
 	private Vector2f velocity = Vector2f.ZERO;
 	private boolean grounded = false;
 	private int facingDirection = 0;
+
+	private Vector2f shootPoint;
 	
 	public SorcererEntity(Engine engine) {
 		super(engine);
@@ -57,7 +58,7 @@ public class SorcererEntity extends Entity {
 		animator.addAnimation("walk_left", new Animation(sheet, new int[] { 2, 3 }, 0.2f, true, false));
 		animator.addAnimation("walk_right", new Animation(sheet, new int[] { 2, 3 }, 0.2f, true, true));
 
-		System.out.println(sheet.getSprites().size());
+		shootPoint = position;
 	}
 
 	@Override
@@ -66,11 +67,16 @@ public class SorcererEntity extends Entity {
 		
 		handleInputs();
 		move();
+		handleShootPoint();
 
 		handleAnimations();
 
 		animator.update();
 		animator.render();
+
+//		Engine.SHAPE_RENDERER.begin(ShapeRenderer.ShapeType.Filled);
+//		Engine.SHAPE_RENDERER.rect(shootPoint.x, shootPoint.y, 5, 5);
+//		Engine.SHAPE_RENDERER.end();
 	}
 	
 	private void handleInputs() {
@@ -88,6 +94,10 @@ public class SorcererEntity extends Entity {
 		if (Gdx.input.isKeyPressed(Keys.Z) && grounded) {
 			jump();
 		}
+
+		if (Gdx.input.isKeyJustPressed(Keys.X)) {
+			shoot();
+		}
 	}
 	
 	private void move() {
@@ -97,6 +107,19 @@ public class SorcererEntity extends Entity {
 	private void jump() {
 		collider.getBody().applyLinearImpulse(0, JUMP_FORCE, collider.getBody().getWorldCenter().x, collider.getBody().getWorldCenter().y, true);
 		grounded = false;
+	}
+
+	private void handleShootPoint() {
+		if (facingDirection == 0) {
+			shootPoint = new Vector2f(position.x - 45f, position.y);
+		} else {
+			shootPoint = new Vector2f(position.x + 45f, position.y);
+		}
+	}
+
+	private void shoot() {
+		SorcererBulletEntity bullet = new SorcererBulletEntity(engine, shootPoint, facingDirection);
+		engine.getCurrentState().addEntity(bullet);
 	}
 
 	private void handleAnimations() {
@@ -129,8 +152,10 @@ public class SorcererEntity extends Entity {
 	public void onCollisionEnter(BoxCollider other, Vector2 normal, Contact contact) {
 		super.onCollisionEnter(other, normal, contact);
 
-		if (normal.y < 0) {
-			grounded = true;
+		if (!(other.getEntity() instanceof Enemy)) {
+			if (normal.y < 0) {
+				grounded = true;
+			}
 		}
    	}
 
@@ -138,6 +163,11 @@ public class SorcererEntity extends Entity {
 	public void onCollisionPreSolve(BoxCollider other, Contact contact) {
 		super.onCollisionPreSolve(other, contact);
 
+		short firstBit = contact.getFixtureA().getFilterData().categoryBits;
+		short secondBit = contact.getFixtureB().getFilterData().categoryBits;
 
+		if ((firstBit | secondBit) == (CollisionConstants.CATEGORY_SORCERER | CollisionConstants.CATEGORY_ENEMY)) {
+			contact.setEnabled(false);
+		}
 	}
 }

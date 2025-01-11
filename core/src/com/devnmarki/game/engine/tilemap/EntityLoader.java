@@ -46,8 +46,6 @@ public class EntityLoader {
                     }
 
                     engine.getCurrentState().addEntity(entity);
-
-                    System.out.println("Loaded entity at position X: " + x + ", Y: " + y);
                 }
             }
         }

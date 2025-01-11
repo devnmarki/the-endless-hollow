@@ -24,6 +24,14 @@ public class Vector2f {
 		this.x = x;
 		this.y = y;
 	}
+
+	public static float distance(Vector2f current, Vector2f other) {
+		return (float) Math.sqrt(Math.pow(current.x - other.x, 2) + Math.pow(current.y - other.y, 2));
+	}
+
+	public String toString() {
+		return "X: " + this.x + " Y: " + this.y;
+	}
 	
 	public Vector2f add(Vector2f vec) {
 		float newX = this.x + vec.x;
@@ -44,10 +52,6 @@ public class Vector2f {
 		float newY = this.y * value;
 		
 		return new Vector2f(newX, newY);
-	}
-	
-	public String toString() {
-		return "X: " + this.x + " Y: " + this.y;
 	}
 	
 }

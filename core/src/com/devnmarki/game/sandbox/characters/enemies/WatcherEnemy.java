@@ -11,7 +11,9 @@ import com.devnmarki.game.engine.entities.renderEntity.animations.Animation;
 import com.devnmarki.game.engine.math.Vector2f;
 import com.devnmarki.game.engine.math.Vector2i;
 import com.devnmarki.game.sandbox.CollisionConstants;
+import com.devnmarki.game.sandbox.characters.IDamageable;
 import com.devnmarki.game.sandbox.characters.SorcererEntity;
+import com.devnmarki.game.sandbox.objects.SorcererBulletEntity;
 
 public class WatcherEnemy extends Enemy {
 
@@ -25,6 +27,8 @@ public class WatcherEnemy extends Enemy {
 
     public WatcherEnemy(Engine engine) {
         super(engine);
+
+        this.setHealthPoints(3);
     }
 
     @Override
@@ -53,6 +57,8 @@ public class WatcherEnemy extends Enemy {
     public void onUpdate() {
         super.onUpdate();
 
+        collider.getBody().setGravityScale(0f);
+
         if (collider.getBody() != null) {
             collider.getBody().setGravityScale(0f);
 
@@ -74,10 +80,27 @@ public class WatcherEnemy extends Enemy {
     }
 
     @Override
+    public void damage(int points) {
+        super.damage(points);
+    }
+
+    @Override
+    public int getHealthPoints() {
+        return 3;
+    }
+
+    @Override
+    protected void die() {
+        super.die();
+
+        this.markForDestroy();
+    }
+
+    @Override
     public void onCollisionEnter(BoxCollider other, Vector2 normal, Contact contact) {
         super.onCollisionEnter(other, normal, contact);
 
-        if (other.getEntity() instanceof SorcererEntity) return;
+        if (other.getEntity() instanceof SorcererEntity || other.getEntity() instanceof SorcererBulletEntity) return;
 
         if (normal.x > 0) velocity.x = -1f;
         else if (normal.x < 0) velocity.x = 1f;
@@ -93,7 +116,6 @@ public class WatcherEnemy extends Enemy {
         short secondBit = contact.getFixtureB().getFilterData().categoryBits;
 
         if ((firstBit | secondBit) == (CollisionConstants.CATEGORY_ENEMY | CollisionConstants.CATEGORY_SORCERER)) {
-            System.out.println("Contact " + firstBit + " " + secondBit);
             contact.setEnabled(false);
         }
     }

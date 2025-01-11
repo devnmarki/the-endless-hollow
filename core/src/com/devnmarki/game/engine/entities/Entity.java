@@ -24,6 +24,9 @@ public class Entity implements IEntity {
 	private List<BoxCollider> colliders = new ArrayList<BoxCollider>();
 	
 	private SpriteRenderer spriteRenderer;
+
+	private boolean isPendingDestroy = false;
+
 	
 	public Entity(Engine engine) {
 		this.engine = engine;
@@ -80,7 +83,18 @@ public class Entity implements IEntity {
 	}
 
 	public void destroy() {
-		engine.getCurrentState().removeEntity(this); 
+		for (BoxCollider collider : colliders) {
+			if (collider != null && collider.getBody() != null) {
+				Engine.WORLD.destroyBody(collider.getBody());
+			}
+		}
+		colliders.clear();
+
+		engine.getCurrentState().removeEntity(this);
+	}
+
+	public void markForDestroy() {
+		isPendingDestroy = true;
 	}
 
 	public void setPosition(Vector2f position) {
@@ -118,4 +132,9 @@ public class Entity implements IEntity {
 	public SpriteRenderer getSpriteRenderer() {
 		return this.spriteRenderer;
 	}
+
+	public boolean isPendingDestroy() {
+		return isPendingDestroy;
+	}
+
 }

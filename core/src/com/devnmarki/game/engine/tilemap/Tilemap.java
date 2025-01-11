@@ -6,9 +6,11 @@ import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.devnmarki.game.engine.Engine;
 import com.devnmarki.game.engine.entities.Entity;
 import com.devnmarki.game.engine.entities.physics.BoxCollider;
+import com.devnmarki.game.engine.entities.physics.SolidEntity;
 import com.devnmarki.game.engine.math.Vector2f;
 import com.devnmarki.game.engine.math.Vector2i;
 import com.devnmarki.game.sandbox.CollisionConstants;
@@ -47,11 +49,7 @@ public class Tilemap {
 			Vector2f colliderPos = new Vector2f(x, y);
 			Vector2f colliderSize = new Vector2f(w, h);
 
-			Entity colliderEntity = new Entity(engine, colliderPos);
-			BoxCollider collider = new BoxCollider(new Vector2i((int) colliderSize.x, (int) colliderSize.y));
-			colliderEntity.addCollider(collider);
-			collider.getFixture().setFilterData(collider.createFilter(CollisionConstants.CATEGORY_WALL, CollisionConstants.MASK_WALL));
-
+			SolidEntity colliderEntity = new SolidEntity(engine, colliderPos, new Vector2i((int) colliderSize.x, (int) colliderSize.y));
 			engine.getCurrentState().addEntity(colliderEntity);
 		}
 	}
