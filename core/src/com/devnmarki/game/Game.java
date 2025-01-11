@@ -8,6 +8,7 @@ import com.devnmarki.game.engine.Engine;
 import com.devnmarki.game.engine.tilemap.EntityLoader;
 import com.devnmarki.game.sandbox.characters.SorcererEntity;
 import com.devnmarki.game.sandbox.characters.enemies.WatcherEnemy;
+import com.devnmarki.game.sandbox.objects.LaddersEntity;
 import com.devnmarki.game.sandbox.states.GameState;
 import com.devnmarki.game.sandbox.states.TestState;
 
@@ -22,7 +23,8 @@ public class Game extends ApplicationAdapter {
 
 		EntityLoader.addEntityToLoad("Player", () -> new SorcererEntity(engine));
 		EntityLoader.addEntityToLoad("Watcher", () -> new WatcherEnemy(engine));
-		
+		EntityLoader.addEntityToLoad("Ladders", () -> new LaddersEntity(engine));
+
 		engine.addState("game", new GameState(engine));
 		engine.addState("test", new TestState(engine));
 		engine.switchState("game");

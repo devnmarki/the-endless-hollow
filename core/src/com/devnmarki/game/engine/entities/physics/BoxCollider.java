@@ -12,7 +12,7 @@ public class BoxCollider {
 
 	private Vector2i size;
 	private Vector2f offset;
-	private BodyDef.BodyType type = BodyDef.BodyType.DynamicBody;
+	private BodyDef.BodyType type = BodyDef.BodyType.StaticBody;
 
 	private Body body;
 	private Fixture fixture;

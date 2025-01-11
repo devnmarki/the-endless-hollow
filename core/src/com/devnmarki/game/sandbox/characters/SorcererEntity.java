@@ -16,6 +16,7 @@ import com.devnmarki.game.engine.math.Vector2f;
 import com.devnmarki.game.engine.math.Vector2i;
 import com.devnmarki.game.sandbox.CollisionConstants;
 import com.devnmarki.game.sandbox.characters.enemies.Enemy;
+import com.devnmarki.game.sandbox.objects.LaddersEntity;
 import com.devnmarki.game.sandbox.objects.SorcererBulletEntity;
 
 public class SorcererEntity extends Entity {
@@ -26,12 +27,16 @@ public class SorcererEntity extends Entity {
 
 	private static final float SPEED = 3f;
 	private static final float JUMP_FORCE = 0.9f;
+	private static final float CLIMB_SPEED = 1f;
 
 	private Vector2f velocity = Vector2f.ZERO;
 	private boolean grounded = false;
 	private int facingDirection = 0;
+	private float currentSpeed = SPEED;
 
 	private Vector2f shootPoint;
+
+	private boolean onLadders = false;
 	
 	public SorcererEntity(Engine engine) {
 		super(engine);
@@ -76,6 +81,16 @@ public class SorcererEntity extends Entity {
 	}
 	
 	private void handleInputs() {
+		if (onLadders) {
+			if (Gdx.input.isKeyPressed(Keys.UP)) {
+				collider.getBody().setLinearVelocity(0, CLIMB_SPEED);
+			} else if (Gdx.input.isKeyPressed(Keys.DOWN)) {
+				collider.getBody().setLinearVelocity(0, -CLIMB_SPEED);
+			} else {
+				collider.getBody().setLinearVelocity(0, 0); // Stop when no input
+			}
+		}
+
 		if (Gdx.input.isKeyPressed(Keys.LEFT)) {
 			velocity.x = -1f;
 			facingDirection = 0;
@@ -97,7 +112,10 @@ public class SorcererEntity extends Entity {
 	}
 	
 	private void move() {
-		collider.getBody().setLinearVelocity(velocity.x * SPEED, collider.getBody().getLinearVelocity().y);
+		if (onLadders) currentSpeed = CLIMB_SPEED;
+		else currentSpeed = SPEED;
+
+		collider.getBody().setLinearVelocity(velocity.x * currentSpeed, collider.getBody().getLinearVelocity().y);
 	}
 	
 	private void jump() {
@@ -153,7 +171,24 @@ public class SorcererEntity extends Entity {
 				grounded = true;
 			}
 		}
+
+		if (other.getEntity() instanceof LaddersEntity) {
+			onLadders = true;
+			collider.getBody().setGravityScale(0f);
+			collider.getBody().setLinearVelocity(0, 0f);
+			grounded = false;
+		}
    	}
+
+	@Override
+	public void onCollisionExit(BoxCollider other) {
+		super.onCollisionExit(other);
+
+		if (other.getEntity() instanceof LaddersEntity) {
+			onLadders = false;
+			collider.getBody().setGravityScale(1f);
+		}
+	}
 
 	@Override
 	public void onCollisionPreSolve(BoxCollider other, Contact contact) {

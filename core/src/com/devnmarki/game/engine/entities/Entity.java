@@ -3,6 +3,7 @@ package com.devnmarki.game.engine.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Filter;
@@ -20,13 +21,14 @@ public class Entity implements IEntity {
 
 	protected Vector2f position;
 	protected float rotation;
+
+	private MapObject mapObject;
 	
 	private List<BoxCollider> colliders = new ArrayList<BoxCollider>();
 	
 	private SpriteRenderer spriteRenderer;
 
 	private boolean isPendingDestroy = false;
-
 	
 	public Entity(Engine engine) {
 		this.engine = engine;
@@ -109,6 +111,10 @@ public class Entity implements IEntity {
 		this.rotation = rotation;
 	}
 
+	public void setMapObject(MapObject mapObject) {
+		this.mapObject = mapObject;
+	}
+
 	public String getTag() {
 		return tag;
 	}
@@ -128,7 +134,11 @@ public class Entity implements IEntity {
 	public List<BoxCollider> getColliders() {
 		return this.colliders;
 	}
-	
+
+	public MapObject getMapObject() {
+		return mapObject;
+	}
+
 	public SpriteRenderer getSpriteRenderer() {
 		return this.spriteRenderer;
 	}

@@ -4,10 +4,8 @@ import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.devnmarki.game.engine.Engine;
 import com.devnmarki.game.engine.entities.Entity;
-import com.devnmarki.game.engine.entities.physics.BoxCollider;
 import com.devnmarki.game.engine.math.Vector2f;
 
-import java.io.Console;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -35,6 +33,7 @@ public class EntityLoader {
                 Supplier<Entity> entityFactory = entities.get(objName);
                 if (entityFactory != null) {
                     Entity entity = entityFactory.get();
+                    entity.setMapObject(obj);
 
                     float x = obj.getProperties().get("x", Float.class) * Engine.gameScale;
                     float y = obj.getProperties().get("y", Float.class) * Engine.gameScale;
@@ -44,6 +43,7 @@ public class EntityLoader {
                         float rotation = obj.getProperties().get("rotation", Float.class);
                         entity.setRotation(rotation);
                     }
+
 
                     engine.getCurrentState().addEntity(entity);
                 }
