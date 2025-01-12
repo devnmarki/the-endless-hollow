@@ -20,10 +20,12 @@ import com.devnmarki.game.engine.entities.Entity;
 import com.devnmarki.game.engine.entities.physics.MyContactListener;
 import com.devnmarki.game.engine.math.Vector2i;
 import com.devnmarki.game.engine.states.State;
+import com.devnmarki.game.engine.ui.UIComponent;
 
 public class Engine {
 
 	public static final SpriteBatch SPRITE_BATCH = new SpriteBatch();
+	public static final SpriteBatch UI_BATCH = new SpriteBatch();
 	public static final ShapeRenderer SHAPE_RENDERER = new ShapeRenderer();
 	public static final World WORLD = new World(new Vector2(0, -15f), true);
 	public static final float PPM = 100f;
@@ -70,6 +72,15 @@ public class Engine {
 			}
 
 			processPendingDestruction();
+
+			UI_BATCH.begin();
+
+			List<UIComponent> UIComponentsCopy = new ArrayList<UIComponent>(currentState.getUIComponents());
+			for (UIComponent comp : UIComponentsCopy) {
+				comp.render();
+			}
+
+			UI_BATCH.end();
 		}
 		
 		if (Gdx.input.isKeyJustPressed(Keys.TAB)) {
@@ -93,6 +104,8 @@ public class Engine {
 	        for (Body body : bodyArray) {
 	            WORLD.destroyBody(body); 
 	        }
+
+			currentState.getUIComponents().clear();
 	        
 			currentState.enter();
 		}

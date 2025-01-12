@@ -14,12 +14,18 @@ import com.devnmarki.game.engine.entities.renderEntity.animations.Animation;
 import com.devnmarki.game.engine.entities.renderEntity.animations.Animator;
 import com.devnmarki.game.engine.math.Vector2f;
 import com.devnmarki.game.engine.math.Vector2i;
+import com.devnmarki.game.engine.ui.Image;
+import com.devnmarki.game.engine.ui.UIComponent;
 import com.devnmarki.game.sandbox.CollisionConstants;
+import com.devnmarki.game.sandbox.Globals;
 import com.devnmarki.game.sandbox.characters.enemies.Enemy;
 import com.devnmarki.game.sandbox.objects.LaddersEntity;
 import com.devnmarki.game.sandbox.objects.SorcererBulletEntity;
 
-public class SorcererEntity extends Entity {
+import java.util.ArrayList;
+import java.util.List;
+
+public class SorcererEntity extends Entity implements IDamageable {
 
 	private Spritesheet sheet;
 	private BoxCollider collider;
@@ -33,10 +39,11 @@ public class SorcererEntity extends Entity {
 	private boolean grounded = false;
 	private int facingDirection = 0;
 	private float currentSpeed = SPEED;
+	private boolean onLadders = false;
 
 	private Vector2f shootPoint;
-
-	private boolean onLadders = false;
+	private int hp = 3;
+	private List<UIComponent> uiHp = new ArrayList<UIComponent>();
 	
 	public SorcererEntity(Engine engine) {
 		super(engine);
@@ -64,6 +71,18 @@ public class SorcererEntity extends Entity {
 		animator.addAnimation("walk_right", new Animation(sheet, new int[] { 2, 3 }, 0.2f, true, true));
 
 		shootPoint = position;
+
+		for (int i = 0; i < hp; i++) {
+			Image hpImage = new Image(
+					new Vector2f(32f + 40f * i, Gdx.graphics.getHeight() - 64f),
+					new Vector2i(32),
+					Globals.Assets.SHEET_OBJECTS_ATLAS.getSprite(12).getTexture()
+			);
+
+			engine.getCurrentState().addUIComponent(hpImage);
+			uiHp.add(hpImage);
+		}
+
 	}
 
 	@Override
@@ -87,7 +106,7 @@ public class SorcererEntity extends Entity {
 			} else if (Gdx.input.isKeyPressed(Keys.DOWN)) {
 				collider.getBody().setLinearVelocity(0, -CLIMB_SPEED);
 			} else {
-				collider.getBody().setLinearVelocity(0, 0); // Stop when no input
+				collider.getBody().setLinearVelocity(0, 0);
 			}
 		}
 
@@ -112,8 +131,10 @@ public class SorcererEntity extends Entity {
 	}
 	
 	private void move() {
-		if (onLadders) currentSpeed = CLIMB_SPEED;
-		else currentSpeed = SPEED;
+		if (onLadders)
+			currentSpeed = CLIMB_SPEED;
+		else
+			currentSpeed = SPEED;
 
 		collider.getBody().setLinearVelocity(velocity.x * currentSpeed, collider.getBody().getLinearVelocity().y);
 	}
@@ -200,5 +221,33 @@ public class SorcererEntity extends Entity {
 		if ((firstBit | secondBit) == (CollisionConstants.CATEGORY_SORCERER | CollisionConstants.CATEGORY_ENEMY)) {
 			contact.setEnabled(false);
 		}
+	}
+
+	@Override
+	public void damage(int points) {
+		hp -= points;
+
+		engine.getCurrentState().removeUIComponent(uiHp.get(uiHp.size() - 1));
+		uiHp.remove(uiHp.size() - 1);
+
+		setHealthPoints(points);
+
+		if (hp <= 0) {
+			System.out.println("LoL loser ded");
+		}
+	}
+
+	@Override
+	public int getHealthPoints() {
+		return hp;
+	}
+
+	@Override
+	public void setHealthPoints(int hp) {
+		this.hp = hp;
+	}
+
+	public List<UIComponent> getUiHp() {
+		return uiHp;
 	}
 }
