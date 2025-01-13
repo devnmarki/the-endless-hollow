@@ -6,12 +6,12 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import com.devnmarki.game.engine.AssetPool;
 import com.devnmarki.game.engine.Engine;
 import com.devnmarki.game.engine.entities.physics.BoxCollider;
+import com.devnmarki.game.engine.entities.physics.Collider;
 import com.devnmarki.game.engine.entities.renderEntity.Spritesheet;
 import com.devnmarki.game.engine.entities.renderEntity.animations.Animation;
 import com.devnmarki.game.engine.math.Vector2f;
 import com.devnmarki.game.engine.math.Vector2i;
 import com.devnmarki.game.sandbox.CollisionConstants;
-import com.devnmarki.game.sandbox.characters.IDamageable;
 import com.devnmarki.game.sandbox.characters.SorcererEntity;
 import com.devnmarki.game.sandbox.objects.SorcererBulletEntity;
 
@@ -98,7 +98,7 @@ public class WatcherEnemy extends Enemy {
     }
 
     @Override
-    public void onCollisionEnter(BoxCollider other, Vector2 normal, Contact contact) {
+    public void onCollisionEnter(Collider other, Vector2 normal, Contact contact) {
         super.onCollisionEnter(other, normal, contact);
 
         if (other.getEntity() instanceof SorcererEntity || other.getEntity() instanceof SorcererBulletEntity) return;
@@ -110,7 +110,7 @@ public class WatcherEnemy extends Enemy {
     }
 
     @Override
-    public void onCollisionPreSolve(BoxCollider other, Contact contact) {
+    public void onCollisionPreSolve(Collider other, Contact contact) {
         super.onCollisionPreSolve(other, contact);
 
         short firstBit = contact.getFixtureA().getFilterData().categoryBits;

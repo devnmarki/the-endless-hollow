@@ -6,11 +6,10 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import com.devnmarki.game.engine.Engine;
 import com.devnmarki.game.engine.entities.Entity;
 import com.devnmarki.game.engine.entities.physics.BoxCollider;
-import com.devnmarki.game.engine.entities.physics.ICollidable;
+import com.devnmarki.game.engine.entities.physics.Collider;
 import com.devnmarki.game.engine.entities.renderEntity.Sprite;
 import com.devnmarki.game.engine.math.Vector2f;
 import com.devnmarki.game.engine.math.Vector2i;
-import com.devnmarki.game.sandbox.CollisionConstants;
 import com.devnmarki.game.sandbox.Globals;
 import com.devnmarki.game.sandbox.characters.IDamageable;
 import com.devnmarki.game.sandbox.characters.SorcererEntity;
@@ -65,7 +64,7 @@ public class SorcererBulletEntity extends Entity {
     }
 
     @Override
-    public void onCollisionEnter(BoxCollider other, Vector2 normal, Contact contact) {
+    public void onCollisionEnter(Collider other, Vector2 normal, Contact contact) {
         super.onCollisionEnter(other, normal, contact);
         if (other.getEntity() instanceof SorcererEntity) return;
 

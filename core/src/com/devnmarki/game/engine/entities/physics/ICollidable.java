@@ -5,8 +5,8 @@ import com.badlogic.gdx.physics.box2d.Contact;
 
 public interface ICollidable {
 
-	void onCollisionEnter(BoxCollider other, Vector2 normal, Contact contact);
-	void onCollisionExit(BoxCollider other);
-	void onCollisionPreSolve(BoxCollider other, Contact contact);
+	void onCollisionEnter(Collider other, Vector2 normal, Contact contact);
+	void onCollisionExit(Collider other);
+	void onCollisionPreSolve(Collider other, Contact contact);
 	
 }

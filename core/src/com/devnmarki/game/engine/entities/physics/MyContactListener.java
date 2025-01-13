@@ -21,11 +21,11 @@ public class MyContactListener implements ContactListener {
         Vector2 normal = contact.getWorldManifold().getNormal();
         
         if (entityA != null && entityA instanceof ICollidable) {
-            ((ICollidable) entityA).onCollisionEnter((BoxCollider) fb.getUserData(), normal, contact);
+            ((ICollidable) entityA).onCollisionEnter((Collider) fb.getUserData(), normal, contact);
         }
 
         if (entityB != null && entityB instanceof ICollidable) {
-            ((ICollidable) entityB).onCollisionEnter((BoxCollider) fa.getUserData(), normal.scl(-1), contact);
+            ((ICollidable) entityB).onCollisionEnter((Collider) fa.getUserData(), normal.scl(-1), contact);
         }
 	}
 
@@ -38,11 +38,11 @@ public class MyContactListener implements ContactListener {
         Entity entityB = (Entity) fb.getBody().getUserData();
         
         if (entityA != null && entityA instanceof ICollidable) {
-            ((ICollidable) entityA).onCollisionExit((BoxCollider) fb.getUserData());
+            ((ICollidable) entityA).onCollisionExit((Collider) fb.getUserData());
         }
 
         if (entityB != null && entityB instanceof ICollidable) {
-            ((ICollidable) entityB).onCollisionExit((BoxCollider) fa.getUserData());
+            ((ICollidable) entityB).onCollisionExit((Collider) fa.getUserData());
         }
 	}
 
@@ -55,11 +55,11 @@ public class MyContactListener implements ContactListener {
         Entity entityB = (Entity) fb.getBody().getUserData();
 
         if (entityA != null && entityA instanceof ICollidable) {
-            ((ICollidable) entityA).onCollisionPreSolve((BoxCollider) fb.getUserData(), contact);
+            ((ICollidable) entityA).onCollisionPreSolve((Collider) fb.getUserData(), contact);
         }
 
         if (entityB != null && entityB instanceof ICollidable) {
-            ((ICollidable) entityB).onCollisionPreSolve((BoxCollider) fa.getUserData(), contact);
+            ((ICollidable) entityB).onCollisionPreSolve((Collider) fa.getUserData(), contact);
         }
 	}
 

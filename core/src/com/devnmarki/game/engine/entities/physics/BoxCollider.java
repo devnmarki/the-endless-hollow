@@ -6,16 +6,10 @@ import com.devnmarki.game.engine.entities.Entity;
 import com.devnmarki.game.engine.math.Vector2f;
 import com.devnmarki.game.engine.math.Vector2i;
 
-public class BoxCollider {
-
-	private Entity entity;
+public class BoxCollider extends Collider {
 
 	private Vector2i size;
 	private Vector2f offset;
-	private BodyDef.BodyType type = BodyDef.BodyType.StaticBody;
-
-	private Body body;
-	private Fixture fixture;
 
 	public BoxCollider(Vector2i size) {
 		this(size, Vector2f.ZERO);
@@ -26,6 +20,7 @@ public class BoxCollider {
 		this.offset = offset;
 	}
 
+	@Override
 	public void update() {
 		if (body == null || entity == null) return;
 
@@ -79,6 +74,7 @@ public class BoxCollider {
 		}
 	}
 
+	@Override
 	public void setEntity(Entity entity) {
 		this.entity = entity;
 		if (body == null) {
@@ -93,6 +89,7 @@ public class BoxCollider {
 		createBody();
 	}
 
+	@Override
 	public void setPosition(Vector2f position) {
 		if (body != null) {
 			body.setTransform(
@@ -107,23 +104,12 @@ public class BoxCollider {
 		this.offset = offset;
 	}
 
+	@Override
 	public void setType(BodyDef.BodyType type) {
 		this.type = type;
 
 		destroyBody();
 		createBody();
-	}
-
-	public Entity getEntity() {
-		return this.entity;
-	}
-
-	public Body getBody() {
-		return this.body;
-	}
-
-	public Fixture getFixture() {
-		return fixture;
 	}
 
 }

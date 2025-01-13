@@ -6,9 +6,9 @@ import java.util.List;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Contact;
-import com.badlogic.gdx.physics.box2d.Filter;
 import com.devnmarki.game.engine.Engine;
 import com.devnmarki.game.engine.entities.physics.BoxCollider;
+import com.devnmarki.game.engine.entities.physics.Collider;
 import com.devnmarki.game.engine.entities.renderEntity.SpriteRenderer;
 import com.devnmarki.game.engine.math.Vector2f;
 
@@ -24,7 +24,7 @@ public class Entity implements IEntity {
 
 	private MapObject mapObject;
 	
-	private List<BoxCollider> colliders = new ArrayList<BoxCollider>();
+	private List<Collider> colliders = new ArrayList<Collider>();
 	
 	private SpriteRenderer spriteRenderer;
 
@@ -53,7 +53,7 @@ public class Entity implements IEntity {
 	}
 	
 	public void onUpdate() {
-		for (BoxCollider collider : colliders) {
+		for (Collider collider : colliders) {
 			collider.update();
 		}
 		
@@ -62,7 +62,7 @@ public class Entity implements IEntity {
 	}
 	
 	@Override
-	public void addCollider(BoxCollider collider) {
+	public void addCollider(Collider collider) {
 		collider.setEntity(this);
 		
 		if (collider.getEntity() != null) {
@@ -71,22 +71,22 @@ public class Entity implements IEntity {
 	}
 	
 	@Override
-	public void onCollisionEnter(BoxCollider other, Vector2 normal, Contact contact) {
+	public void onCollisionEnter(Collider other, Vector2 normal, Contact contact) {
 		
 	}
 	
 	@Override
-	public void onCollisionExit(BoxCollider other) {
+	public void onCollisionExit(Collider other) {
 		
 	}
 
 	@Override
-	public void onCollisionPreSolve(BoxCollider other, Contact contact) {
+	public void onCollisionPreSolve(Collider other, Contact contact) {
 
 	}
 
 	public void destroy() {
-		for (BoxCollider collider : colliders) {
+		for (Collider collider : colliders) {
 			if (collider != null && collider.getBody() != null) {
 				Engine.WORLD.destroyBody(collider.getBody());
 			}
@@ -104,7 +104,7 @@ public class Entity implements IEntity {
 	public void setPosition(Vector2f position) {
 		this.position = position;
 
-		for (BoxCollider collider : colliders) {
+		for (Collider collider : colliders) {
 			collider.setPosition(position);
 		}
 	}
@@ -133,7 +133,7 @@ public class Entity implements IEntity {
 		return this.rotation;
 	}
 	
-	public List<BoxCollider> getColliders() {
+	public List<Collider> getColliders() {
 		return this.colliders;
 	}
 

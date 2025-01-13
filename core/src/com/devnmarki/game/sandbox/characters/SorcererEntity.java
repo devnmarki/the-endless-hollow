@@ -9,6 +9,8 @@ import com.devnmarki.game.engine.AssetPool;
 import com.devnmarki.game.engine.Engine;
 import com.devnmarki.game.engine.entities.Entity;
 import com.devnmarki.game.engine.entities.physics.BoxCollider;
+import com.devnmarki.game.engine.entities.physics.CircleCollider;
+import com.devnmarki.game.engine.entities.physics.Collider;
 import com.devnmarki.game.engine.entities.renderEntity.Spritesheet;
 import com.devnmarki.game.engine.entities.renderEntity.animations.Animation;
 import com.devnmarki.game.engine.entities.renderEntity.animations.Animator;
@@ -28,11 +30,11 @@ import java.util.List;
 public class SorcererEntity extends Entity implements IDamageable {
 
 	private Spritesheet sheet;
-	private BoxCollider collider;
+	private CircleCollider collider;
 	private Animator animator;
 
 	public static final float SPEED = 3f;
-	private static final float JUMP_FORCE = 0.9f;
+	private static final float JUMP_FORCE = 0.6f;
 	private static final float CLIMB_SPEED = 1f;
 
 	private Vector2f velocity = Vector2f.ZERO;
@@ -59,7 +61,7 @@ public class SorcererEntity extends Entity implements IDamageable {
 		this.tag = "player";
 		this.name = "Sorcerer";
 
-		collider = new BoxCollider(new Vector2i(6, 7).mul((int)Engine.gameScale), new Vector2f(4f, -4.5f).mul(Engine.gameScale));
+		collider = new CircleCollider(3f, new Vector2f(4f, -4.9f).mul(Engine.gameScale));
 		collider.setType(BodyDef.BodyType.DynamicBody);
 		this.addCollider(collider);
 		collider.getFixture().getFilterData().categoryBits = CollisionConstants.CATEGORY_SORCERER;
@@ -97,10 +99,6 @@ public class SorcererEntity extends Entity implements IDamageable {
 		move();
 		handleShootPoint();
 		handleAnimations();
-
-		if (Gdx.input.isKeyJustPressed(Keys.SPACE)) {
-			this.damage(1);
-		}
 	}
 	
 	private void handleInputs() {
@@ -191,7 +189,7 @@ public class SorcererEntity extends Entity implements IDamageable {
 	}
 
 	@Override
-	public void onCollisionEnter(BoxCollider other, Vector2 normal, Contact contact) {
+	public void onCollisionEnter(Collider other, Vector2 normal, Contact contact) {
 		super.onCollisionEnter(other, normal, contact);
 
 		if (!(other.getEntity() instanceof Enemy)) {
@@ -209,7 +207,7 @@ public class SorcererEntity extends Entity implements IDamageable {
    	}
 
 	@Override
-	public void onCollisionExit(BoxCollider other) {
+	public void onCollisionExit(Collider other) {
 		super.onCollisionExit(other);
 
 		if (other.getEntity() instanceof LaddersEntity) {
@@ -219,7 +217,7 @@ public class SorcererEntity extends Entity implements IDamageable {
 	}
 
 	@Override
-	public void onCollisionPreSolve(BoxCollider other, Contact contact) {
+	public void onCollisionPreSolve(Collider other, Contact contact) {
 		super.onCollisionPreSolve(other, contact);
 
 		short firstBit = contact.getFixtureA().getFilterData().categoryBits;
