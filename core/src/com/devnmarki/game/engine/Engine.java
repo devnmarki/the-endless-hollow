@@ -20,10 +20,12 @@ import com.devnmarki.game.engine.entities.Entity;
 import com.devnmarki.game.engine.entities.physics.MyContactListener;
 import com.devnmarki.game.engine.math.Vector2i;
 import com.devnmarki.game.engine.states.State;
+import com.devnmarki.game.engine.ui.UIComponent;
 
 public class Engine {
 
 	public static final SpriteBatch SPRITE_BATCH = new SpriteBatch();
+	public static final SpriteBatch UI_BATCH = new SpriteBatch();
 	public static final ShapeRenderer SHAPE_RENDERER = new ShapeRenderer();
 	public static final World WORLD = new World(new Vector2(0, -15f), true);
 	public static final float PPM = 100f;
@@ -35,9 +37,10 @@ public class Engine {
 	private State previousState = null;
 
 	private Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
-	
 	public static boolean debugMode = true;
-	
+
+	private boolean shouldReloadState = false;
+
 	public Engine() {
 		this.start();
 	}
@@ -49,18 +52,24 @@ public class Engine {
 	public void update() {
 		if (currentState != null) {
 			currentState.update();
-			
+
 			WORLD.step(1 / 60f, 6, 2);
-			
+			processPendingDestruction();
+
+			if (shouldReloadState) {
+				reloadCurrentState();
+				shouldReloadState = false; // Reset the flag
+			}
+
 			SPRITE_BATCH.begin();
-			
+
 			currentState.render();
-			
+
 			List<Entity> entitiesCopy = new ArrayList<Entity>(currentState.getEntities());
 			for (Entity e : entitiesCopy) {
 				e.onUpdate();
 			}
-			
+
 			SPRITE_BATCH.end();
 
 			SPRITE_BATCH.setProjectionMatrix(getCurrentState().getCamera().combined);
@@ -69,7 +78,15 @@ public class Engine {
 				debugRenderer.render(WORLD, SPRITE_BATCH.getProjectionMatrix().cpy().scale(Engine.PPM, Engine.PPM, 1));
 			}
 
-			processPendingDestruction();
+
+			UI_BATCH.begin();
+
+			List<UIComponent> UIComponentsCopy = new ArrayList<UIComponent>(currentState.getUIComponents());
+			for (UIComponent comp : UIComponentsCopy) {
+				comp.render();
+			}
+
+			UI_BATCH.end();
 		}
 		
 		if (Gdx.input.isKeyJustPressed(Keys.TAB)) {
@@ -93,6 +110,8 @@ public class Engine {
 	        for (Body body : bodyArray) {
 	            WORLD.destroyBody(body); 
 	        }
+
+			currentState.getUIComponents().clear();
 	        
 			currentState.enter();
 		}
@@ -138,6 +157,10 @@ public class Engine {
 	
 	public void clear(float r, float g, float b) {
 		ScreenUtils.clear(r / 255f, g / 255f, b /255f, 1);
+	}
+
+	public void setShouldReloadState(boolean shouldReloadState) {
+		this.shouldReloadState = shouldReloadState;
 	}
 	
 	public State getCurrentState() {

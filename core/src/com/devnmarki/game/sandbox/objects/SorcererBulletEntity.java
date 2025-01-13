@@ -67,6 +67,7 @@ public class SorcererBulletEntity extends Entity {
     @Override
     public void onCollisionEnter(BoxCollider other, Vector2 normal, Contact contact) {
         super.onCollisionEnter(other, normal, contact);
+        if (other.getEntity() instanceof SorcererEntity) return;
 
         if (other.getEntity() instanceof Enemy) {
             Enemy enemy = (Enemy) other.getEntity();
@@ -75,7 +76,6 @@ public class SorcererBulletEntity extends Entity {
             }
         }
 
-        if (other.getEntity() instanceof SorcererEntity) return;
 
         this.markForDestroy();
     }

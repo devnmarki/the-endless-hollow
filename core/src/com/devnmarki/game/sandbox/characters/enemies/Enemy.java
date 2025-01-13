@@ -1,7 +1,11 @@
 package com.devnmarki.game.sandbox.characters.enemies;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Contact;
 import com.devnmarki.game.engine.Engine;
 import com.devnmarki.game.engine.entities.Entity;
+import com.devnmarki.game.engine.entities.physics.BoxCollider;
 import com.devnmarki.game.engine.entities.renderEntity.animations.Animator;
 import com.devnmarki.game.sandbox.characters.IDamageable;
 import com.devnmarki.game.sandbox.characters.SorcererEntity;
@@ -11,6 +15,8 @@ public abstract class Enemy extends Entity implements IDamageable {
     public static final int STATE_IDLE = 0;
     public static final int STATE_PATROL = 1;
 
+    private static final float DAMAGE_WAIT_TIME = 0.5f;
+
     private SorcererEntity sorcerer;
 
     private Animator animator;
@@ -18,6 +24,9 @@ public abstract class Enemy extends Entity implements IDamageable {
     private int currentState = STATE_IDLE;
 
     private int hp;
+    private int damage;
+
+    private float damageTimer = 0f;
 
     public Enemy(Engine engine) {
         super(engine);
@@ -86,8 +95,34 @@ public abstract class Enemy extends Entity implements IDamageable {
 
     }
 
+    @Override
+    public void onCollisionEnter(BoxCollider other, Vector2 normal, Contact contact) {
+        super.onCollisionEnter(other, normal, contact);
+
+        damageTimer += Gdx.graphics.getDeltaTime();
+        if (damageTimer >= DAMAGE_WAIT_TIME) {
+            if (other.getEntity() instanceof SorcererEntity) {
+                IDamageable sorcererDamageable = (IDamageable) other.getEntity();
+                sorcererDamageable.damage(getDamage());
+            }
+
+            damageTimer = 0f;
+        }
+    }
+
+    @Override
+    public void onCollisionExit(BoxCollider other) {
+        super.onCollisionExit(other);
+
+        damageTimer = DAMAGE_WAIT_TIME;
+    }
+
     public void setCurrentState(int state) {
         this.currentState = state;
+    }
+
+    public void setDamage(int damage) {
+        this.damage = damage;
     }
 
     public SorcererEntity getSorcerer() {
@@ -100,5 +135,9 @@ public abstract class Enemy extends Entity implements IDamageable {
 
     public int getCurrentState() {
         return currentState;
+    }
+
+    public int getDamage() {
+        return damage;
     }
 }

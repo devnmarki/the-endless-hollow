@@ -14,11 +14,18 @@ import com.devnmarki.game.engine.entities.renderEntity.animations.Animation;
 import com.devnmarki.game.engine.entities.renderEntity.animations.Animator;
 import com.devnmarki.game.engine.math.Vector2f;
 import com.devnmarki.game.engine.math.Vector2i;
+import com.devnmarki.game.engine.ui.Image;
+import com.devnmarki.game.engine.ui.UIComponent;
 import com.devnmarki.game.sandbox.CollisionConstants;
+import com.devnmarki.game.sandbox.Globals;
 import com.devnmarki.game.sandbox.characters.enemies.Enemy;
+import com.devnmarki.game.sandbox.objects.LaddersEntity;
 import com.devnmarki.game.sandbox.objects.SorcererBulletEntity;
 
-public class SorcererEntity extends Entity {
+import java.util.ArrayList;
+import java.util.List;
+
+public class SorcererEntity extends Entity implements IDamageable {
 
 	private Spritesheet sheet;
 	private BoxCollider collider;
@@ -26,15 +33,22 @@ public class SorcererEntity extends Entity {
 
 	private static final float SPEED = 3f;
 	private static final float JUMP_FORCE = 0.9f;
+	private static final float CLIMB_SPEED = 1f;
 
 	private Vector2f velocity = Vector2f.ZERO;
-	private boolean grounded = false;
+	private float currentSpeed = SPEED;
 	private int facingDirection = 0;
+	private boolean grounded = false;
+	private boolean onLadders = false;
 
 	private Vector2f shootPoint;
+	private int hp = 3;
+	private List<UIComponent> uiHp = new ArrayList<UIComponent>();
 	
 	public SorcererEntity(Engine engine) {
 		super(engine);
+
+		this.loadHpUi();
 	}
 
 	@Override
@@ -61,6 +75,19 @@ public class SorcererEntity extends Entity {
 		shootPoint = position;
 	}
 
+	private void loadHpUi() {
+		for (int i = 0; i < hp; i++) {
+			Image hpImage = new Image(
+					new Vector2f(32f + 40f * i, Gdx.graphics.getHeight() - 64f),
+					new Vector2i(32),
+					Globals.Assets.SHEET_OBJECTS_ATLAS.getSprite(12).getTexture()
+			);
+
+			engine.getCurrentState().addUIComponent(hpImage);
+			uiHp.add(hpImage);
+		}
+	}
+
 	@Override
 	public void onUpdate() {
 		super.onUpdate();
@@ -68,14 +95,24 @@ public class SorcererEntity extends Entity {
 		handleInputs();
 		move();
 		handleShootPoint();
-
 		handleAnimations();
 
-		animator.update();
-		animator.render();
+		if (Gdx.input.isKeyJustPressed(Keys.SPACE)) {
+			this.damage(1);
+		}
 	}
 	
 	private void handleInputs() {
+		if (onLadders) {
+			if (Gdx.input.isKeyPressed(Keys.UP)) {
+				collider.getBody().setLinearVelocity(0, CLIMB_SPEED);
+			} else if (Gdx.input.isKeyPressed(Keys.DOWN)) {
+				collider.getBody().setLinearVelocity(0, -CLIMB_SPEED);
+			} else {
+				collider.getBody().setLinearVelocity(0, 0);
+			}
+		}
+
 		if (Gdx.input.isKeyPressed(Keys.LEFT)) {
 			velocity.x = -1f;
 			facingDirection = 0;
@@ -97,7 +134,12 @@ public class SorcererEntity extends Entity {
 	}
 	
 	private void move() {
-		collider.getBody().setLinearVelocity(velocity.x * SPEED, collider.getBody().getLinearVelocity().y);
+		if (onLadders)
+			currentSpeed = CLIMB_SPEED;
+		else
+			currentSpeed = SPEED;
+
+		collider.getBody().setLinearVelocity(velocity.x * currentSpeed, collider.getBody().getLinearVelocity().y);
 	}
 	
 	private void jump() {
@@ -119,6 +161,9 @@ public class SorcererEntity extends Entity {
 	}
 
 	private void handleAnimations() {
+		animator.update();
+		animator.render();
+
 		if (velocity.x == 0f) {
 			switch (facingDirection) {
 				case 0:
@@ -153,7 +198,24 @@ public class SorcererEntity extends Entity {
 				grounded = true;
 			}
 		}
+
+		if (other.getEntity() instanceof LaddersEntity) {
+			onLadders = true;
+			grounded = false;
+			collider.getBody().setGravityScale(0f);
+			collider.getBody().setLinearVelocity(0, 0f);
+		}
    	}
+
+	@Override
+	public void onCollisionExit(BoxCollider other) {
+		super.onCollisionExit(other);
+
+		if (other.getEntity() instanceof LaddersEntity) {
+			onLadders = false;
+			collider.getBody().setGravityScale(1f);
+		}
+	}
 
 	@Override
 	public void onCollisionPreSolve(BoxCollider other, Contact contact) {
@@ -165,5 +227,41 @@ public class SorcererEntity extends Entity {
 		if ((firstBit | secondBit) == (CollisionConstants.CATEGORY_SORCERER | CollisionConstants.CATEGORY_ENEMY)) {
 			contact.setEnabled(false);
 		}
+	}
+
+	@Override
+	public void damage(int points) {
+		hp -= points;
+
+		if (!uiHp.isEmpty()) {
+			engine.getCurrentState().removeUIComponent(uiHp.get(uiHp.size() - 1));
+			uiHp.remove(uiHp.size() - 1);
+		}
+
+		setHealthPoints(hp);
+
+		if (hp <= 0) {
+			die();
+		}
+
+	}
+
+	private void die() {
+		this.markForDestroy();
+		engine.setShouldReloadState(true);
+	}
+
+	@Override
+	public void setHealthPoints(int hp) {
+		this.hp = hp;
+	}
+
+	@Override
+	public int getHealthPoints() {
+		return hp;
+	}
+
+	public List<UIComponent> getUiHp() {
+		return uiHp;
 	}
 }

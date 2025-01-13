@@ -50,6 +50,7 @@ public class Tilemap {
 			Vector2f colliderSize = new Vector2f(w, h);
 
 			SolidEntity colliderEntity = new SolidEntity(engine, colliderPos, new Vector2i((int) colliderSize.x, (int) colliderSize.y));
+			colliderEntity.setMapObject(colliderObject);
 			engine.getCurrentState().addEntity(colliderEntity);
 		}
 	}
