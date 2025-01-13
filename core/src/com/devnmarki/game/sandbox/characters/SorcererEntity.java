@@ -31,7 +31,7 @@ public class SorcererEntity extends Entity implements IDamageable {
 	private BoxCollider collider;
 	private Animator animator;
 
-	private static final float SPEED = 3f;
+	public static final float SPEED = 3f;
 	private static final float JUMP_FORCE = 0.9f;
 	private static final float CLIMB_SPEED = 1f;
 
@@ -40,6 +40,7 @@ public class SorcererEntity extends Entity implements IDamageable {
 	private int facingDirection = 0;
 	private boolean grounded = false;
 	private boolean onLadders = false;
+	private boolean isSlowed = false;
 
 	private Vector2f shootPoint;
 	private int hp = 3;
@@ -136,7 +137,7 @@ public class SorcererEntity extends Entity implements IDamageable {
 	private void move() {
 		if (onLadders)
 			currentSpeed = CLIMB_SPEED;
-		else
+		else if (!isSlowed)
 			currentSpeed = SPEED;
 
 		collider.getBody().setLinearVelocity(velocity.x * currentSpeed, collider.getBody().getLinearVelocity().y);
@@ -259,6 +260,22 @@ public class SorcererEntity extends Entity implements IDamageable {
 	@Override
 	public int getHealthPoints() {
 		return hp;
+	}
+
+	public void setCurrentSpeed(float speed) {
+		this.currentSpeed = speed;
+	}
+
+	public void setIsSlowed(boolean isSlowed) {
+		this.isSlowed = isSlowed;
+	}
+
+	public boolean isSlowed() {
+		return isSlowed;
+	}
+
+	public float getCurrentSpeed() {
+		return currentSpeed;
 	}
 
 	public List<UIComponent> getUiHp() {
