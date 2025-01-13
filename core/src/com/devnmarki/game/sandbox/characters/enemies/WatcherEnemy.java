@@ -29,6 +29,7 @@ public class WatcherEnemy extends Enemy {
         super(engine);
 
         this.setHealthPoints(3);
+        this.setDamage(1);
     }
 
     @Override

@@ -29,6 +29,7 @@ public class Entity implements IEntity {
 	private SpriteRenderer spriteRenderer;
 
 	private boolean isPendingDestroy = false;
+	protected boolean isDestroyed = false;
 	
 	public Entity(Engine engine) {
 		this.engine = engine;
@@ -97,6 +98,7 @@ public class Entity implements IEntity {
 
 	public void markForDestroy() {
 		isPendingDestroy = true;
+		isDestroyed = true;
 	}
 
 	public void setPosition(Vector2f position) {

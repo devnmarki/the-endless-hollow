@@ -37,9 +37,10 @@ public class Engine {
 	private State previousState = null;
 
 	private Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
-	
 	public static boolean debugMode = true;
-	
+
+	private boolean shouldReloadState = false;
+
 	public Engine() {
 		this.start();
 	}
@@ -51,18 +52,24 @@ public class Engine {
 	public void update() {
 		if (currentState != null) {
 			currentState.update();
-			
+
 			WORLD.step(1 / 60f, 6, 2);
-			
+			processPendingDestruction();
+
+			if (shouldReloadState) {
+				reloadCurrentState();
+				shouldReloadState = false; // Reset the flag
+			}
+
 			SPRITE_BATCH.begin();
-			
+
 			currentState.render();
-			
+
 			List<Entity> entitiesCopy = new ArrayList<Entity>(currentState.getEntities());
 			for (Entity e : entitiesCopy) {
 				e.onUpdate();
 			}
-			
+
 			SPRITE_BATCH.end();
 
 			SPRITE_BATCH.setProjectionMatrix(getCurrentState().getCamera().combined);
@@ -71,7 +78,6 @@ public class Engine {
 				debugRenderer.render(WORLD, SPRITE_BATCH.getProjectionMatrix().cpy().scale(Engine.PPM, Engine.PPM, 1));
 			}
 
-			processPendingDestruction();
 
 			UI_BATCH.begin();
 
@@ -151,6 +157,10 @@ public class Engine {
 	
 	public void clear(float r, float g, float b) {
 		ScreenUtils.clear(r / 255f, g / 255f, b /255f, 1);
+	}
+
+	public void setShouldReloadState(boolean shouldReloadState) {
+		this.shouldReloadState = shouldReloadState;
 	}
 	
 	public State getCurrentState() {

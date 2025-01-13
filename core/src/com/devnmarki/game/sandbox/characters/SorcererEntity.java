@@ -201,9 +201,9 @@ public class SorcererEntity extends Entity implements IDamageable {
 
 		if (other.getEntity() instanceof LaddersEntity) {
 			onLadders = true;
+			grounded = false;
 			collider.getBody().setGravityScale(0f);
 			collider.getBody().setLinearVelocity(0, 0f);
-			grounded = false;
 		}
    	}
 
@@ -240,8 +240,6 @@ public class SorcererEntity extends Entity implements IDamageable {
 
 		setHealthPoints(hp);
 
-		System.out.println("HP: " + hp);
-
 		if (hp <= 0) {
 			die();
 		}
@@ -249,7 +247,8 @@ public class SorcererEntity extends Entity implements IDamageable {
 	}
 
 	private void die() {
-		System.out.println("U ded loser");
+		this.markForDestroy();
+		engine.setShouldReloadState(true);
 	}
 
 	@Override
