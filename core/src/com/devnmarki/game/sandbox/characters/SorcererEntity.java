@@ -36,9 +36,9 @@ public class SorcererEntity extends Entity implements IDamageable {
 	private static final float CLIMB_SPEED = 1f;
 
 	private Vector2f velocity = Vector2f.ZERO;
-	private boolean grounded = false;
-	private int facingDirection = 0;
 	private float currentSpeed = SPEED;
+	private int facingDirection = 0;
+	private boolean grounded = false;
 	private boolean onLadders = false;
 
 	private Vector2f shootPoint;
@@ -47,6 +47,8 @@ public class SorcererEntity extends Entity implements IDamageable {
 	
 	public SorcererEntity(Engine engine) {
 		super(engine);
+
+		this.loadHpUi();
 	}
 
 	@Override
@@ -71,7 +73,9 @@ public class SorcererEntity extends Entity implements IDamageable {
 		animator.addAnimation("walk_right", new Animation(sheet, new int[] { 2, 3 }, 0.2f, true, true));
 
 		shootPoint = position;
+	}
 
+	private void loadHpUi() {
 		for (int i = 0; i < hp; i++) {
 			Image hpImage = new Image(
 					new Vector2f(32f + 40f * i, Gdx.graphics.getHeight() - 64f),
@@ -82,7 +86,6 @@ public class SorcererEntity extends Entity implements IDamageable {
 			engine.getCurrentState().addUIComponent(hpImage);
 			uiHp.add(hpImage);
 		}
-
 	}
 
 	@Override
@@ -92,11 +95,11 @@ public class SorcererEntity extends Entity implements IDamageable {
 		handleInputs();
 		move();
 		handleShootPoint();
-
 		handleAnimations();
 
-		animator.update();
-		animator.render();
+		if (Gdx.input.isKeyJustPressed(Keys.SPACE)) {
+			this.damage(1);
+		}
 	}
 	
 	private void handleInputs() {
@@ -158,6 +161,9 @@ public class SorcererEntity extends Entity implements IDamageable {
 	}
 
 	private void handleAnimations() {
+		animator.update();
+		animator.render();
+
 		if (velocity.x == 0f) {
 			switch (facingDirection) {
 				case 0:
@@ -227,24 +233,33 @@ public class SorcererEntity extends Entity implements IDamageable {
 	public void damage(int points) {
 		hp -= points;
 
-		engine.getCurrentState().removeUIComponent(uiHp.get(uiHp.size() - 1));
-		uiHp.remove(uiHp.size() - 1);
+		if (!uiHp.isEmpty()) {
+			engine.getCurrentState().removeUIComponent(uiHp.get(uiHp.size() - 1));
+			uiHp.remove(uiHp.size() - 1);
+		}
 
-		setHealthPoints(points);
+		setHealthPoints(hp);
+
+		System.out.println("HP: " + hp);
 
 		if (hp <= 0) {
-			System.out.println("LoL loser ded");
+			die();
 		}
+
 	}
 
-	@Override
-	public int getHealthPoints() {
-		return hp;
+	private void die() {
+		System.out.println("U ded loser");
 	}
 
 	@Override
 	public void setHealthPoints(int hp) {
 		this.hp = hp;
+	}
+
+	@Override
+	public int getHealthPoints() {
+		return hp;
 	}
 
 	public List<UIComponent> getUiHp() {
