@@ -8,6 +8,7 @@ import com.devnmarki.game.engine.entities.Entity;
 import com.devnmarki.game.engine.entities.physics.BoxCollider;
 import com.devnmarki.game.engine.entities.physics.Collider;
 import com.devnmarki.game.engine.entities.renderEntity.animations.Animator;
+import com.devnmarki.game.engine.math.Vector2f;
 import com.devnmarki.game.sandbox.characters.IDamageable;
 import com.devnmarki.game.sandbox.characters.SorcererEntity;
 
@@ -93,6 +94,10 @@ public abstract class Enemy extends Entity implements IDamageable {
     }
 
     protected void die() {
+
+    }
+
+    public void knockback(Vector2f force) {
 
     }
 

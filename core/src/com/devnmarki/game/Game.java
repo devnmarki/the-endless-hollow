@@ -10,6 +10,7 @@ import com.devnmarki.game.sandbox.characters.SorcererEntity;
 import com.devnmarki.game.sandbox.characters.enemies.WatcherEnemy;
 import com.devnmarki.game.sandbox.objects.CobwebEntity;
 import com.devnmarki.game.sandbox.objects.LaddersEntity;
+import com.devnmarki.game.sandbox.objects.SpikesEntity;
 import com.devnmarki.game.sandbox.states.GameState;
 import com.devnmarki.game.sandbox.states.TestState;
 
@@ -26,6 +27,7 @@ public class Game extends ApplicationAdapter {
 		EntityLoader.addEntityToLoad("Watcher", () -> new WatcherEnemy(engine));
 		EntityLoader.addEntityToLoad("Ladders", () -> new LaddersEntity(engine));
 		EntityLoader.addEntityToLoad("Cobweb", () -> new CobwebEntity(engine));
+		EntityLoader.addEntityToLoad("Spikes", () -> new SpikesEntity(engine));
 
 		engine.addState("game", new GameState(engine));
 		engine.addState("test", new TestState(engine));

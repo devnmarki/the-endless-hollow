@@ -98,6 +98,14 @@ public class WatcherEnemy extends Enemy {
     }
 
     @Override
+    public void knockback(Vector2f force) {
+        super.knockback(force);
+
+        Vector2 scaledForce = new Vector2(force.x / Engine.PPM, force.y / Engine.PPM);
+        collider.getBody().applyLinearImpulse(scaledForce, collider.getBody().getWorldCenter(), true);
+    }
+
+    @Override
     public void onCollisionEnter(Collider other, Vector2 normal, Contact contact) {
         super.onCollisionEnter(other, normal, contact);
 

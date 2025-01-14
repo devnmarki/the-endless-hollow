@@ -62,7 +62,7 @@ public class SorcererBulletEntity extends Entity {
 
         collider.getBody().setLinearVelocity(velocityX * SPEED, 0f);
     }
-
+    
     @Override
     public void onCollisionEnter(Collider other, Vector2 normal, Contact contact) {
         super.onCollisionEnter(other, normal, contact);
@@ -70,6 +70,8 @@ public class SorcererBulletEntity extends Entity {
 
         if (other.getEntity() instanceof Enemy) {
             Enemy enemy = (Enemy) other.getEntity();
+            enemy.knockback(new Vector2f(-100f, 0f));
+
             if (enemy instanceof IDamageable) {
                 ((IDamageable) enemy).damage(DAMAGE);
             }
