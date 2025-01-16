@@ -1,6 +1,5 @@
 package com.devnmarki.game.sandbox.objects;
 
-import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.devnmarki.game.engine.Engine;
 import com.devnmarki.game.engine.entities.Entity;
 import com.devnmarki.game.engine.entities.physics.BoxCollider;

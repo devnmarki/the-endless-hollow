@@ -6,7 +6,9 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import com.devnmarki.game.engine.Engine;
 import com.devnmarki.game.engine.entities.Entity;
 import com.devnmarki.game.engine.entities.physics.BoxCollider;
+import com.devnmarki.game.engine.entities.physics.Collider;
 import com.devnmarki.game.engine.entities.renderEntity.animations.Animator;
+import com.devnmarki.game.engine.math.Vector2f;
 import com.devnmarki.game.sandbox.characters.IDamageable;
 import com.devnmarki.game.sandbox.characters.SorcererEntity;
 
@@ -95,8 +97,12 @@ public abstract class Enemy extends Entity implements IDamageable {
 
     }
 
+    public void knockback(Vector2f force) {
+
+    }
+
     @Override
-    public void onCollisionEnter(BoxCollider other, Vector2 normal, Contact contact) {
+    public void onCollisionEnter(Collider other, Vector2 normal, Contact contact) {
         super.onCollisionEnter(other, normal, contact);
 
         damageTimer += Gdx.graphics.getDeltaTime();
@@ -111,7 +117,7 @@ public abstract class Enemy extends Entity implements IDamageable {
     }
 
     @Override
-    public void onCollisionExit(BoxCollider other) {
+    public void onCollisionExit(Collider other) {
         super.onCollisionExit(other);
 
         damageTimer = DAMAGE_WAIT_TIME;
